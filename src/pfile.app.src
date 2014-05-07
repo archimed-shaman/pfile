@@ -1,0 +1,13 @@
+{application, pfile,
+ [
+  {description, ""},
+  {vsn, "1.0.0"},
+  {modules, [pfile]},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { pfile_app, []}},
+  {env, []}
+ ]}.

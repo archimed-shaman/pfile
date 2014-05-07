@@ -3,4 +3,9 @@ deps
 *.o
 *.beam
 *.plt
+ebin
+.idea
+pfile.iml
 erl_crash.dump
+src/pfile_lexer.erl
+src/pfile_parser.erl

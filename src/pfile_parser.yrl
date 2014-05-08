@@ -19,7 +19,8 @@
 %%%-------------------------------------------------------------------
 
 
-Nonterminals root_symbol section_sequence sections element section noname_section pair unary optionset option empty_value.
+Nonterminals root_symbol section_sequence sections element section noname_section
+             pair unary optionset option empty_value semicolon.
 
 Terminals '{' '}' '=' 'id' 'value' ';' 'section_name'.
 
@@ -63,11 +64,10 @@ unary ->
 
 
 option ->
-    element ';' option : ['$1' | '$3'].
+    element semicolon option : ['$1' | '$3'].
 option ->
-    element ';' : ['$1'].
-option ->
-    element : ['$1'].
+    element semicolon : ['$1'].
+
 
 
 element ->
@@ -84,8 +84,13 @@ optionset ->
 
 empty_value ->
     value : value('$1').
-
 empty_value ->
+    '$empty' : nil.
+
+
+semicolon ->
+    ';' semicolon : '$1'.
+semicolon  ->
     '$empty' : nil.
 
 

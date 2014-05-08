@@ -66,5 +66,5 @@ truncate_id(TokenChars, _TokenLen) ->
                                 E == $\t;
                                 E == $\n;
                                 E == $= -> false;
-                       (E) -> true end,
+                       (_) -> true end,
                     TokenChars).

@@ -19,47 +19,96 @@
 %%%-------------------------------------------------------------------
 
 
-Nonterminals document block blocks entries entry word equation.
+Nonterminals root_symbol distinguished_symbol section_sequence first_section section section_ node node_ node__ leaf leaf_.
 
-Terminals '{' '}' '=' 'term' ';' 'section'.
+Terminals '{' '}' '=' 'token' 'string' ';' 'section_name'.
 
-Rootsymbol document.
+Rootsymbol root_symbol.
+
+root_symbol ->
+    distinguished_symbol : {config, '$1'}.
+
+distinguished_symbol ->
+    first_section : '$1'.
+distinguished_symbol ->
+    first_section section_sequence : ['$1' | '$2'].
+distinguished_symbol ->
+    section_sequence : ['$1'].
+
+section_sequence ->
+    section : ['$1'].
+section_sequence ->
+    section section_sequence : ['$1' | '$2'].
 
 
-document ->
-    blocks : '$1'.
-document ->
-    section blocks : {value('$1'), '$2'}.
+first_section ->
+    node : ['$1'].
+first_section ->
+    leaf : ['$1'].
+first_section ->
+    node first_section : ['$1' | '$2'].
+first_section ->
+    leaf first_section : ['$1' | '$2'].
 
-blocks ->
-    block : '$1'.
-blocks ->
-    block blocks : ['$1' | ['$2']].
 
-block ->
+
+section ->
+    'section_name' : {value('$1'), [[]]}.
+section ->
+    'section_name' section_ : {value('$1'), '$2'}.
+
+section_ ->
+    node : ['$1'].
+section_ ->
+    leaf : ['$1'].
+section_ ->
+    node section : ['$1' | '$2'].
+section_ ->
+    leaf section : ['$1' | '$2'].
+
+
+
+node ->
+    token '=' node_ : {value('$1'), '$2'}.
+node ->
+    node_ : '$1'.
+
+node_ ->
     '{' '}' : [].
-block ->
-    '{' entries '}' : '$2'.
+node_ ->
+    '{' node__ '}' : '$2'.
+node_ ->
+    '{' node__ '}' ';' : '$2'.
 
-entries ->
-    entry : ['$1'].
-entries ->
-    entry ';' entries: ['$1' | '$3'].
 
-entry ->
-    word : '$1'.
-entry ->
-    block : '$1'.
-entry ->
-    equation : '$1'.
 
-equation ->
-    word '=' word : {'$1', '$3'}.
-equation ->
-    word '=' blocks : {'$1', '$3'}.
+node__ ->
+    node : ['$1'].
+node__ ->
+    leaf : ['$1'].
+node__ ->
+    node node__ : ['$1' | '$2'].
+node__ ->
+    leaf node__ :  ['$1' | '$2'].
 
-word ->
-    'term' : value('$1').
+
+
+leaf ->
+    token '=' leaf_ : {value('$1'), '$3'}.
+leaf ->
+    leaf_ : '$1'.
+
+
+leaf_ ->
+    ';' : null.
+leaf_ ->
+    token : value('$1').
+leaf_ ->
+    string : value('$1').
+leaf_ ->
+    token ';' : value('$1').
+leaf_ ->
+    string ';' : value('$1').
 
 
 Erlang code.

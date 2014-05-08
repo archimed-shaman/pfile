@@ -25,17 +25,12 @@ STRING = [\s*&@%^~|A-Za-z0-9_.?<>/'(),+:!\x80-\xff-]
 TOKEN = [*&@%^~|A-Za-z0-9_.?<>/'(),+:!\x80-\xff-]
 SECTION = [A-Za-z0-9_.-]
 
-%ID = [A-Za-z0-9_.-]
-%WS = ([\000-\s\n]|%.*)
-
-
 Rules.
 
 
 \[{SECTION}+\] : A = strip(TokenChars,TokenLen), {token, {section_name, A, TokenLine}}.
 [\{\};=] : {token,{list_to_atom(TokenChars), TokenLine}}.
 
-%{ID}+ : {token, {term, TokenChars, TokenLine}}.
 
 \"({STRING}|\x5c\x22)+\" : S = normalize_string(TokenChars,TokenLen), {token, {string, S, TokenLine}}.
 {TOKEN}+ : {token, {token, TokenChars, TokenLine}}.

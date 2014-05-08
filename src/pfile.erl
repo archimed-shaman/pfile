@@ -26,3 +26,16 @@
 -module(pfile).
 -author("Alexander Morozov aka ~ArchimeD~").
 
+-export([parse/1]).
+
+
+parse(String) when is_list(String) ->
+  parse_grammar(pfile_lexer:string(String)).
+
+
+
+parse_grammar({error, _, _} = Error) ->
+  Error;
+
+parse_grammar({ok, Tokens, _Lines}) ->
+  pfile_parser:parse(Tokens).

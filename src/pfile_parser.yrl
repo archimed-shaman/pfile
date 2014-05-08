@@ -89,11 +89,6 @@ empty_value ->
     '$empty' : nil.
 
 
-
-
-
-
-
 Erlang code.
 
 value({Token, _Line}) ->

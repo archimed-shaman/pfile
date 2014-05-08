@@ -30,6 +30,7 @@
 -export([normalize_string/2,
          truncate_id/2]).
 
+
 normalize_string([_ | TokenChars], TokenLen) ->
     normalize_string(TokenChars, [], TokenLen - 1).
 
@@ -60,6 +61,10 @@ shadow(Symb, [Next | Rest], Acc, Counter) ->
 
 
 truncate_id(TokenChars, _TokenLen) ->
-    lists:takewhile(fun(E) when E == $ ; E == $= -> false;
+    lists:takewhile(fun(E) when E == $\s;
+                                E == $\r;
+                                E == $\t;
+                                E == $\n;
+                                E == $= -> false;
                        (E) -> true end,
                     TokenChars).

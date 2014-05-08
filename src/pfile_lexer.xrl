@@ -33,7 +33,7 @@ Rules.
 [\{\};=] : {token,{list_to_atom(TokenChars), TokenLine}}.
 
 
-\"({STRING}|\x5c\x22)+\" : S = normalize_string(TokenChars,TokenLen), {token, {value, S, TokenLine}}.
+\"({STRING}|\x5c\x22|{LWS})+\" : S = normalize_string(TokenChars,TokenLen), {token, {value, S, TokenLine}}.
 
 {ID}+{LWS}*= : {token, {id, truncate_id(TokenChars, TokenLen), TokenLine} ,[$=]}.
 

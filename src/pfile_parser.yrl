@@ -19,32 +19,35 @@
 %%%-------------------------------------------------------------------
 
 
-Nonterminals root_symbol pfile_grammar element section pair unary optionset options empty_value.
+Nonterminals root_symbol section_sequence sections element section noname_section pair unary optionset option empty_value.
 
 Terminals '{' '}' '=' 'id' 'value' ';' 'section_name'.
 
 Rootsymbol root_symbol.
 
 root_symbol ->
-    pfile_grammar : {config, '$1'}.
-
-
-pfile_grammar ->
-    element : '$1'.
-pfile_grammar ->
-    element ';' : '$1'.
-pfile_grammar ->
-    section : '$1'.
+    section_sequence : '$1'.
 
 
 section ->
-    section_name : '$1'.
+    section_name option : {value('$1'), '$2'}.
+section ->
+    section_name : {value('$1'), []}.
 
 
-element ->
-    pair : '$1'.
-element ->
-    unary : '$1'.
+noname_section ->
+    option : {'$1'}.
+
+
+section_sequence ->
+    noname_section sections : ['$1' | '$2'].
+section_sequence ->
+    sections : '$1'.
+
+sections ->
+    section sections : ['$1' | '$2'].
+sections ->
+    '$empty' : [].
 
 
 pair ->
@@ -59,19 +62,24 @@ unary ->
     optionset : '$1'.
 
 
+option ->
+    element ';' option : ['$1' | '$3'].
+option ->
+    element ';' : ['$1'].
+option ->
+    element : ['$1'].
+
+
+element ->
+    pair : '$1'.
+element ->
+    unary : '$1'.
+
+
 optionset ->
     '{' '}' : [].
 optionset ->
-    '{' options '}' : '$2'.
-
-
-options ->
-    element ';' options : ['$1' | '$3'].
-options ->
-    element ';' : ['$1'].
-options ->
-    element : ['$1'].
-
+    '{' option '}' : '$2'.
 
 
 empty_value ->
@@ -89,6 +97,6 @@ empty_value ->
 Erlang code.
 
 value({Token, _Line}) ->
-    Token;
+    list_to_binary(Token);
 value({_Token, Value, _Line}) ->
-    Value.
+    list_to_binary(Value).

@@ -27,7 +27,8 @@
 -author("Alexander Morozov aka ~ArchimeD~").
 
 %% API
--export([normalize_string/2]).
+-export([normalize_string/2,
+         truncate_id/2]).
 
 normalize_string([_ | TokenChars], TokenLen) ->
     normalize_string(TokenChars, [], TokenLen - 1).
@@ -55,3 +56,10 @@ shadow(_Symb, [$" = Next | Rest], Acc, Counter) ->
     {[Next | Acc], Rest, Counter - 1};
 shadow(Symb, [Next | Rest], Acc, Counter) ->
     {[Next, Symb | Acc], Rest, Counter - 1}.
+
+
+
+truncate_id(TokenChars, _TokenLen) ->
+    lists:takewhile(fun(E) when E == $ ; E == $= -> false;
+                       (E) -> true end,
+                    TokenChars).

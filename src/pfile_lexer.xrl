@@ -24,6 +24,7 @@ LWS = [\s\r\t\n]
 STRING = [\s*&@%^~|A-Za-z0-9_.?<>/'(),+:!\x80-\xff-]
 TOKEN = [*&@%^~|A-Za-z0-9_.?<>/'(),+:!\x80-\xff-]
 SECTION = [A-Za-z0-9_.-]
+ID = [A-Za-z0-9_.-]
 
 Rules.
 
@@ -32,8 +33,11 @@ Rules.
 [\{\};=] : {token,{list_to_atom(TokenChars), TokenLine}}.
 
 
-\"({STRING}|\x5c\x22)+\" : S = normalize_string(TokenChars,TokenLen), {token, {string, S, TokenLine}}.
-{TOKEN}+ : {token, {token, TokenChars, TokenLine}}.
+\"({STRING}|\x5c\x22)+\" : S = normalize_string(TokenChars,TokenLen), {token, {value, S, TokenLine}}.
+
+{ID}+{LWS}*= : {token, {id, truncate_id(TokenChars, TokenLen), TokenLine} ,[$=]}.
+
+{TOKEN}+ : {token, {value, TokenChars, TokenLine}}.
 
 #.* : skip_token.
 
@@ -43,10 +47,13 @@ Rules.
 Erlang code.
 
 
-strip(TokenChars,TokenLen) ->
+strip(TokenChars, TokenLen) ->
     lists:sublist(TokenChars, 2, TokenLen - 2).
 
-normalize_string(TokenChars,TokenLen) ->
+normalize_string(TokenChars, TokenLen) ->
     pfile_utils:normalize_string(TokenChars, TokenLen).
+
+truncate_id(TokenChars, TokenLen) ->
+    pfile_utils:truncate_id(TokenChars, TokenLen).
 
 

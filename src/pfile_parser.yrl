@@ -19,96 +19,71 @@
 %%%-------------------------------------------------------------------
 
 
-Nonterminals root_symbol distinguished_symbol section_sequence first_section section section_ node node_ node__ leaf leaf_.
+Nonterminals root_symbol pfile_grammar element section pair unary optionset options empty_value.
 
-Terminals '{' '}' '=' 'token' 'string' ';' 'section_name'.
+Terminals '{' '}' '=' 'id' 'value' ';' 'section_name'.
 
 Rootsymbol root_symbol.
 
 root_symbol ->
-    distinguished_symbol : {config, '$1'}.
-
-distinguished_symbol ->
-    first_section : '$1'.
-distinguished_symbol ->
-    first_section section_sequence : ['$1' | '$2'].
-distinguished_symbol ->
-    section_sequence : ['$1'].
-
-section_sequence ->
-    section : ['$1'].
-section_sequence ->
-    section section_sequence : ['$1' | '$2'].
+    pfile_grammar : {config, '$1'}.
 
 
-first_section ->
-    node : ['$1'].
-first_section ->
-    leaf : ['$1'].
-first_section ->
-    node first_section : ['$1' | '$2'].
-first_section ->
-    leaf first_section : ['$1' | '$2'].
-
+pfile_grammar ->
+    element : '$1'.
+pfile_grammar ->
+    element ';' : '$1'.
+pfile_grammar ->
+    section : '$1'.
 
 
 section ->
-    'section_name' : {value('$1'), [[]]}.
-section ->
-    'section_name' section_ : {value('$1'), '$2'}.
-
-section_ ->
-    node : ['$1'].
-section_ ->
-    leaf : ['$1'].
-section_ ->
-    node section : ['$1' | '$2'].
-section_ ->
-    leaf section : ['$1' | '$2'].
+    section_name : '$1'.
 
 
+element ->
+    pair : '$1'.
+element ->
+    unary : '$1'.
 
-node ->
-    token '=' node_ : {value('$1'), '$2'}.
-node ->
-    node_ : '$1'.
 
-node_ ->
+pair ->
+    id '=' optionset : {value('$1'), '$3'}.
+pair ->
+    id '=' empty_value : {value('$1'), '$3'}.
+
+
+unary ->
+    value : value('$1').
+unary ->
+    optionset : '$1'.
+
+
+optionset ->
     '{' '}' : [].
-node_ ->
-    '{' node__ '}' : '$2'.
-node_ ->
-    '{' node__ '}' ';' : '$2'.
+optionset ->
+    '{' options '}' : '$2'.
+
+
+options ->
+    element ';' options : ['$1' | '$3'].
+options ->
+    element ';' : ['$1'].
+options ->
+    element : ['$1'].
 
 
 
-node__ ->
-    node : ['$1'].
-node__ ->
-    leaf : ['$1'].
-node__ ->
-    node node__ : ['$1' | '$2'].
-node__ ->
-    leaf node__ :  ['$1' | '$2'].
+empty_value ->
+    value : value('$1').
+
+empty_value ->
+    '$empty' : nil.
 
 
 
-leaf ->
-    token '=' leaf_ : {value('$1'), '$3'}.
-leaf ->
-    leaf_ : '$1'.
 
 
-leaf_ ->
-    ';' : null.
-leaf_ ->
-    token : value('$1').
-leaf_ ->
-    string : value('$1').
-leaf_ ->
-    token ';' : value('$1').
-leaf_ ->
-    string ';' : value('$1').
 
 
 Erlang code.

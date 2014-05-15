@@ -18,6 +18,9 @@
 %%% along with pfile.  If not, see <http://www.gnu.org/licenses/>.
 %%%-------------------------------------------------------------------
 
+%%%===================================================================
+%%% Definitions
+%%%===================================================================
 
 Nonterminals root_symbol section_sequence sections element section noname_section
              pair unary optionset option empty_value semicolon.
@@ -26,8 +29,28 @@ Terminals '{' '}' '=' 'id' 'value' ';' 'section_name'.
 
 Rootsymbol root_symbol.
 
+%%%===================================================================
+%%% Rules
+%%%===================================================================
+
 root_symbol ->
     section_sequence : '$1'.
+
+
+section_sequence ->
+    noname_section sections : ['$1' | '$2'].
+section_sequence ->
+    sections : '$1'.
+
+
+noname_section ->
+    option : {'$1'}.
+
+
+sections ->
+    section sections : ['$1' | '$2'].
+sections ->
+    '$empty' : [].
 
 
 section ->
@@ -36,19 +59,16 @@ section ->
     section_name : {value('$1'), []}.
 
 
-noname_section ->
-    option : {'$1'}.
+option ->
+    element semicolon option : ['$1' | '$3'].
+option ->
+    element semicolon : ['$1'].
 
 
-section_sequence ->
-    noname_section sections : ['$1' | '$2'].
-section_sequence ->
-    sections : '$1'.
-
-sections ->
-    section sections : ['$1' | '$2'].
-sections ->
-    '$empty' : [].
+element ->
+    pair : '$1'.
+element ->
+    unary : '$1'.
 
 
 pair ->
@@ -61,19 +81,6 @@ unary ->
     value : value('$1').
 unary ->
     optionset : '$1'.
-
-
-option ->
-    element semicolon option : ['$1' | '$3'].
-option ->
-    element semicolon : ['$1'].
-
-
-
-element ->
-    pair : '$1'.
-element ->
-    unary : '$1'.
 
 
 optionset ->
@@ -94,9 +101,14 @@ semicolon  ->
     '$empty' : nil.
 
 
+%%%===================================================================
+%%% Erlang code
+%%%===================================================================
+
 Erlang code.
 
 value({Token, _Line}) ->
     list_to_binary(Token);
+
 value({_Token, Value, _Line}) ->
     list_to_binary(Value).

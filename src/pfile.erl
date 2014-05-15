@@ -2,7 +2,7 @@
 %%% @author Alexander Morozov aka ~ArchimeD~
 %%% @copyright 2014, Alexander Morozov
 %%% @doc
-%%% Main module
+%%% The main module with API functions
 %%% @end
 %%%
 %%% Copyright (c) 2014 Alexander Morozov
@@ -26,16 +26,48 @@
 -module(pfile).
 -author("Alexander Morozov aka ~ArchimeD~").
 
+-type error_spec() :: {StringNo :: number(), pfile_parser,
+		       Description :: [string()]}
+		    | {StringNo :: number(), pfile_lexer,
+		       Description :: term()}.
+
+%% API
+
 -export([parse/1]).
 
+%%%===================================================================
+%%% API
+%%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Parses the input string.
+%% @end
+%%--------------------------------------------------------------------
+
+-spec parse(string()) -> {ok, [any()]} |
+			 {error, error_spec()}.
 
 parse(String) when is_list(String) ->
-  parse_grammar(pfile_lexer:string(String)).
+    parse_grammar(pfile_lexer:string(String)).
 
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
 
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%% Takes the input from lexer and passes it to parser
+%% @end
+%%--------------------------------------------------------------------
 
-parse_grammar({error, _, _} = Error) ->
-  Error;
+-spec parse_grammar({'error', _, _} | {'ok', _, _}) ->
+			   {ok, [any()]} |
+			   {error, error_spec()}.
+
+parse_grammar({error, Description, _Lines} = _Error) ->
+    {error, Description};
 
 parse_grammar({ok, Tokens, _Lines}) ->
-  pfile_parser:parse(Tokens).
+    pfile_parser:parse(Tokens).

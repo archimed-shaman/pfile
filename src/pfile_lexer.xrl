@@ -18,40 +18,61 @@
 %%% along with pfile.  If not, see <http://www.gnu.org/licenses/>.
 %%%-------------------------------------------------------------------
 
+%%%===================================================================
+%%% Definitions
+%%%===================================================================
+
 Definitions.
 
 LWS = [\s\r\t\n]
-STRING = [\s*&@%^~|A-Za-z0-9_.?<>/'(),+:!\x80-\xff-]
 TOKEN = [*&@%^~|A-Za-z0-9_.?<>/'(),+:!\x80-\xff-]
 SECTION = [A-Za-z0-9_.-]
 ID = [A-Za-z0-9_.-]
 
+%%%===================================================================
+%%% Rules
+%%%===================================================================
+
 Rules.
 
-
+%% section name
 \[{SECTION}+\] : A = strip(TokenChars,TokenLen), {token, {section_name, A, TokenLine}}.
+
+%% symbols {};=, leave them as is
 [\{\};=] : {token,{list_to_atom(TokenChars), TokenLine}}.
 
+%% quoted string with possible shadowed quotes - \"
+\"(\\.|[^"])*\" : S = normalize_string(TokenChars,TokenLen), {token, {value, S, TokenLine}}.
 
-\"({STRING}|\x5c\x22|{LWS})+\" : S = normalize_string(TokenChars,TokenLen), {token, {value, S, TokenLine}}.
-
+%% key with equation symbol. takes the word and returns '=' symbol to the stream
 {ID}+{LWS}*= : {token, {id, truncate_id(TokenChars, TokenLen), TokenLine} ,[$=]}.
 
+%% all ther values are interpreted, as values
 {TOKEN}+ : {token, {value, TokenChars, TokenLine}}.
 
+%% comments
 #.* : skip_token.
 
+%% spaces, tabulars, line wraps, just skip them
 {LWS}+ : skip_token.
 
+%%%===================================================================
+%%% Erlang code
+%%%===================================================================
 
 Erlang code.
+
 
 
 strip(TokenChars, TokenLen) ->
     lists:sublist(TokenChars, 2, TokenLen - 2).
 
+
+
 normalize_string(TokenChars, _TokenLen) ->
     pfile_utils:normalize_string(TokenChars).
+
+
 
 truncate_id(TokenChars, TokenLen) ->
     pfile_utils:truncate_id(TokenChars, TokenLen).

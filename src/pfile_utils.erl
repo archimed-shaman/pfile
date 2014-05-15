@@ -2,7 +2,7 @@
 %%% @author Alexander Morozov aka ~ArchimeD~
 %%% @copyright 2014, Alexander Morozov
 %%% @doc
-%%% String utils
+%%% Some service sunctions, used by lexer and parser
 %%% @end
 %%%
 %%% Copyright (c) 2014 Alexander Morozov
@@ -27,10 +27,13 @@
 -author("Alexander Morozov aka ~ArchimeD~").
 
 %% API
+
 -export([normalize_string/1,
          truncate_id/2]).
 
-
+%%%===================================================================
+%%% API
+%%%===================================================================
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -39,7 +42,7 @@
 %% @end
 %%--------------------------------------------------------------------
 
--spec normalize_string(string()) -> [string()].
+-spec normalize_string(string()) -> string().
 
 normalize_string([]) ->
     [];
@@ -49,7 +52,18 @@ normalize_string([$" | TokenChars]) ->
 
 
 
--spec truncate_id(maybe_improper_list(),_) -> [any()].
+%%--------------------------------------------------------------------
+%% @doc
+%% When lexer takes a key, it should find the equation symbol to ensure,
+%% that it is exactly the key. So, the string looks like "key =".
+%% Tabulars, space, line wraps and the equation symbol should be removed
+%% from the end of output string. So, if the input is "key_name  =",
+%% output will be "key_name".
+%% It is a dirty hack, but there is no other obvious way.
+%% @end
+%%--------------------------------------------------------------------
+
+-spec truncate_id(string(), any()) -> string().
 
 truncate_id(TokenChars, _TokenLen) ->
     lists:takewhile(fun(E) when E == $\s;
@@ -60,14 +74,26 @@ truncate_id(TokenChars, _TokenLen) ->
                        (_) -> true end,
                     TokenChars).
 
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
 
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%% Removes the quote from end of the string, and replaces the
+%% shadowed quotes with the customary one inside the string.
+%% Is used by normalize_string/1
+%% @end
+%%--------------------------------------------------------------------
 
--spec normalize_string(_,[any()]) -> [any()].
+-spec normalize_string(Input :: string(), Accumulator :: string()) ->
+			      Output :: string().
 
 normalize_string([], Acc) ->
     lists:reverse(Acc);
 
-normalize_string([$"], Acc) ->
+normalize_string([$"], Acc) -> %% it is the tailing quote
     lists:reverse(Acc);
 
 normalize_string([$\\ = Symb | Rest], Acc) ->
@@ -79,12 +105,22 @@ normalize_string([Symb | Rest], Acc) ->
 
 
 
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%% Substitutes the shadowe quote with the quote symbol:
+%% \" -> "
+%% @end
+%%--------------------------------------------------------------------
 
--spec shadow(92,maybe_improper_list(),[any()]) -> {[any()],_}.
+-spec shadow(ShadowSymbol :: 92, Input::string(), Accumulator::string())
+	    -> {ProceededSymbols :: string(), Rest :: string()}.
 
-shadow(_Symb, [], Acc) ->
-    {Acc, []};
+shadow(Symb, [], Acc) ->
+    {[Symb | Acc], []};
+
 shadow(_Symb, [$" = Next | Rest], Acc) ->
     {[Next | Acc], Rest};
+
 shadow(Symb, [Next | Rest], Acc) ->
     {[Next, Symb | Acc], Rest}.

@@ -50,8 +50,8 @@ Erlang code.
 strip(TokenChars, TokenLen) ->
     lists:sublist(TokenChars, 2, TokenLen - 2).
 
-normalize_string(TokenChars, TokenLen) ->
-    pfile_utils:normalize_string(TokenChars, TokenLen).
+normalize_string(TokenChars, _TokenLen) ->
+    pfile_utils:normalize_string(TokenChars).
 
 truncate_id(TokenChars, TokenLen) ->
     pfile_utils:truncate_id(TokenChars, TokenLen).

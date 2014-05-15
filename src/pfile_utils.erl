@@ -27,38 +27,29 @@
 -author("Alexander Morozov aka ~ArchimeD~").
 
 %% API
--export([normalize_string/2,
+-export([normalize_string/1,
          truncate_id/2]).
 
 
-normalize_string([_ | TokenChars], TokenLen) ->
-    normalize_string(TokenChars, [], TokenLen - 1).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Removes the quotes from begin and end of the string, and replaces the
+%% shadowed quotes with the customary one inside the string.
+%% @end
+%%--------------------------------------------------------------------
+
+-spec normalize_string(string()) -> [string()].
+
+normalize_string([]) ->
+    [];
+
+normalize_string([$" | TokenChars]) ->
+    normalize_string(TokenChars, []).
 
 
 
-normalize_string([], Acc, _) ->
-    lists:reverse(Acc);
-
-normalize_string([$\\ = Symb | Rest], Acc, Counter) when Counter > 1 ->
-    {NewAcc, Tail, NewCounter} = shadow(Symb, Rest, Acc, Counter - 1),
-    normalize_string(Tail, NewAcc, NewCounter);
-
-normalize_string([Symb | Rest], Acc, Counter) when Counter > 1 ->
-    normalize_string(Rest, [Symb | Acc], Counter - 1);
-
-normalize_string(_, Acc, _) ->
-    lists:reverse(Acc).
-
-
-
-shadow(_Symb, [], Acc, Counter) ->
-    {Acc, [], Counter - 1};
-shadow(_Symb, [$" = Next | Rest], Acc, Counter) ->
-    {[Next | Acc], Rest, Counter - 1};
-shadow(Symb, [Next | Rest], Acc, Counter) ->
-    {[Next, Symb | Acc], Rest, Counter - 1}.
-
-
+-spec truncate_id(maybe_improper_list(),_) -> [any()].
 
 truncate_id(TokenChars, _TokenLen) ->
     lists:takewhile(fun(E) when E == $\s;
@@ -68,3 +59,32 @@ truncate_id(TokenChars, _TokenLen) ->
                                 E == $= -> false;
                        (_) -> true end,
                     TokenChars).
+
+
+
+-spec normalize_string(_,[any()]) -> [any()].
+
+normalize_string([], Acc) ->
+    lists:reverse(Acc);
+
+normalize_string([$"], Acc) ->
+    lists:reverse(Acc);
+
+normalize_string([$\\ = Symb | Rest], Acc) ->
+    {NewAcc, Tail} = shadow(Symb, Rest, Acc),
+    normalize_string(Tail, NewAcc);
+
+normalize_string([Symb | Rest], Acc) ->
+    normalize_string(Rest, [Symb | Acc]).
+
+
+
+
+-spec shadow(92,maybe_improper_list(),[any()]) -> {[any()],_}.
+
+shadow(_Symb, [], Acc) ->
+    {Acc, []};
+shadow(_Symb, [$" = Next | Rest], Acc) ->
+    {[Next | Acc], Rest};
+shadow(Symb, [Next | Rest], Acc) ->
+    {[Next, Symb | Acc], Rest}.

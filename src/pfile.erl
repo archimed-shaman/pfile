@@ -27,9 +27,9 @@
 -author("Alexander Morozov aka ~ArchimeD~").
 
 -type error_spec() :: {StringNo :: number(), pfile_parser,
-		       Description :: [string()]}
-		    | {StringNo :: number(), pfile_lexer,
-		       Description :: term()}.
+                       Description :: [string()]}
+                    | {StringNo :: number(), pfile_lexer,
+                       Description :: term()}.
 
 %% API
 
@@ -46,7 +46,7 @@
 %%--------------------------------------------------------------------
 
 -spec parse(string()) -> {ok, [any()]} |
-			 {error, error_spec()}.
+                         {error, error_spec()}.
 
 parse(String) when is_list(String) ->
     parse_grammar(pfile_lexer:string(String)).
@@ -63,8 +63,8 @@ parse(String) when is_list(String) ->
 %%--------------------------------------------------------------------
 
 -spec parse_grammar({'error', _, _} | {'ok', _, _}) ->
-			   {ok, [any()]} |
-			   {error, error_spec()}.
+                           {ok, [any()]} |
+                           {error, error_spec()}.
 
 parse_grammar({error, Description, _Lines} = _Error) ->
     {error, Description};

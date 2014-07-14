@@ -47,7 +47,7 @@ Rules.
 %% key with equation symbol. takes the word and returns '=' symbol to the stream
 {ID}+{LWS}*= : {token, {id, truncate_id(TokenChars, TokenLen), TokenLine} ,[$=]}.
 
-%% all ther values are interpreted, as values
+%% all other values are interpreted, as values
 {TOKEN}+ : {token, {value, TokenChars, TokenLine}}.
 
 %% comments

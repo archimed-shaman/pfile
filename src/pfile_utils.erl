@@ -88,7 +88,7 @@ truncate_id(TokenChars, _TokenLen) ->
 %%--------------------------------------------------------------------
 
 -spec normalize_string(Input :: string(), Accumulator :: string()) ->
-			      Output :: string().
+                              Output :: string().
 
 normalize_string([], Acc) ->
     lists:reverse(Acc);
@@ -113,8 +113,8 @@ normalize_string([Symb | Rest], Acc) ->
 %% @end
 %%--------------------------------------------------------------------
 
--spec shadow(ShadowSymbol :: 92, Input::string(), Accumulator::string())
-	    -> {ProceededSymbols :: string(), Rest :: string()}.
+-spec shadow(ShadowSymbol :: 92, Input::string(), Accumulator::string()) ->
+                    {ProceededSymbols :: string(), Rest :: string()}.
 
 shadow(Symb, [], Acc) ->
     {[Symb | Acc], []};

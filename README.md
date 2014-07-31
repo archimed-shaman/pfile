@@ -11,7 +11,9 @@ Build
 =====
 
 To build the pfile library just run make.
+```bash
 $ make
+```
 
 
 Example:

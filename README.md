@@ -8,12 +8,14 @@ Dependencies
  - make
 
 Build
+=====
 
 To build the pfile library just run make.
 $ make
 
 
 Example:
+=====
 
 ```
 #first anonymous section
@@ -65,5 +67,6 @@ pfile:parse(binary_to_list(Data)).
 ```
 
 Testing
+=====
 
 There is a possible bug in line counting. So, unit test a not valid now. Waiting for pull request approvement: https://github.com/erlang/otp/pull/431

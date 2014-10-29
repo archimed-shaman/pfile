@@ -35,6 +35,8 @@
 
 -export([parse/1]).
 
+
+
 %%%===================================================================
 %%% API
 %%%===================================================================
@@ -45,11 +47,16 @@
 %% @end
 %%--------------------------------------------------------------------
 
--spec parse(string()) -> {ok, [any()]} |
-                         {error, error_spec()}.
+-spec parse(String) -> Result when
+      String :: string(),
+      Result :: {ok, list()} |
+                {error, error_spec()}.
+
 
 parse(String) when is_list(String) ->
     parse_grammar(pfile_lexer:string(String)).
+
+
 
 %%%===================================================================
 %%% Internal functions
@@ -62,9 +69,17 @@ parse(String) when is_list(String) ->
 %% @end
 %%--------------------------------------------------------------------
 
--spec parse_grammar({'error', _, _} | {'ok', _, _}) ->
-                           {ok, [any()]} |
-                           {error, error_spec()}.
+-spec parse_grammar(ParserOutput) -> Result when
+      ParserOutput :: {error, Description, Line} |
+                      {ok, Tokens, Lines},
+      Description :: error_spec(),
+      Line :: number(),
+      Tokens :: number(),
+      Line :: number(),
+      Lines :: number(),
+      Result :: {ok, list()} |
+                {error, Description}.
+
 
 parse_grammar({error, Description, _Lines} = _Error) ->
     {error, Description};

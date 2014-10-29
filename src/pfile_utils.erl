@@ -31,6 +31,8 @@
 -export([normalize_string/1,
          truncate_id/2]).
 
+
+
 %%%===================================================================
 %%% API
 %%%===================================================================
@@ -42,7 +44,10 @@
 %% @end
 %%--------------------------------------------------------------------
 
--spec normalize_string(string()) -> string().
+-spec normalize_string(String) -> Result when
+      String :: string(),
+      Result :: string().
+
 
 normalize_string([]) ->
     [];
@@ -63,7 +68,11 @@ normalize_string([$" | TokenChars]) ->
 %% @end
 %%--------------------------------------------------------------------
 
--spec truncate_id(string(), any()) -> string().
+-spec truncate_id(TokenChars, TokenLen) -> Result when
+      TokenChars :: string(),
+      TokenLen :: number(),
+      Result :: string().
+
 
 truncate_id(TokenChars, _TokenLen) ->
     lists:takewhile(fun(E) when E == $\s;
@@ -73,6 +82,8 @@ truncate_id(TokenChars, _TokenLen) ->
                                 E == $= -> false;
                        (_) -> true end,
                     TokenChars).
+
+
 
 %%%===================================================================
 %%% Internal functions
@@ -87,8 +98,11 @@ truncate_id(TokenChars, _TokenLen) ->
 %% @end
 %%--------------------------------------------------------------------
 
--spec normalize_string(Input :: string(), Accumulator :: string()) ->
-                              Output :: string().
+-spec normalize_string(Input, Accumulator) -> Result when
+      Input :: string(),
+      Accumulator :: string(),
+      Result :: string().
+
 
 normalize_string([], Acc) ->
     lists:reverse(Acc);
@@ -113,8 +127,14 @@ normalize_string([Symb | Rest], Acc) ->
 %% @end
 %%--------------------------------------------------------------------
 
--spec shadow(ShadowSymbol :: 92, Input::string(), Accumulator::string()) ->
-                    {ProceededSymbols :: string(), Rest :: string()}.
+-spec shadow(ShadowSymbol, Input, Accumulator) -> Result when
+      ShadowSymbol :: 92,
+      Input :: string(),
+      Accumulator :: string(),
+      Result :: {ParsedSymbols, Rest},
+      ParsedSymbols :: string(),
+      Rest :: string().
+
 
 shadow(Symb, [], Acc) ->
     {[Symb | Acc], []};
